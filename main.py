@@ -30,8 +30,8 @@ def get_student(student_id: int = Path(..., description="input the Id of the stu
 
 # gt - greater than , lt - lesser than , ge - greater than equals to , le - less than or equals to 
 # query parameter is used to pass a value into a url 
-@app.get("/get-by-name")
-def get_student(name:str):
+@app.get("/get-by-name/{student_id}")
+def get_student(* , student_id : int ,name:str , test:int):
     for student_id in students:
         if students[student_id]["name"] == name:
             return students[student_id]
