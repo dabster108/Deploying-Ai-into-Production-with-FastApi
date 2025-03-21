@@ -22,17 +22,33 @@ def create_item(item : Item):
 # 404 not found  : resource not found 
 # 201 : sucessfully object created 
 
-
 class User(BaseModel): # so the items now will inherit from the basemodel 
     name : str 
     email : str 
     age : int 
 
 
+
+
 # Validation error 
-# try : 
-#     invalid_user = User(username = "dikshata" , email = "dikshanta@gmail.com",
-#                         age= 30)
-#     print("Invalid user : "  ,  invalid_user)
-# except ValidationError as e :
-#     print("Validation error ", e )
+try : 
+    invalid_user = User(username = "dikshata" , email = "dikshanta@gmail.com",
+                        age= 30)
+    print("Invalid user : "  ,  invalid_user)
+except ValidationError as e :
+    print("Validation error ", e )
+
+
+
+users_db = {}
+
+@app.post("/users", response_model=User)
+async def create_user(user: User):
+    users_db[user.name] = user  # Store the user in a dictionary
+    return user
+
+@app.get("/users/{user_name}", response_model=User)
+def get_user(user_name: str):
+    if user_name not in users_db:
+        return {"error": "User not found"}
+    return users_db[user_name]
