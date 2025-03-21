@@ -1,4 +1,5 @@
-![alt text](image-1.png)
+![image](https://github.com/user-attachments/assets/51870481-6fdb-40c7-b17c-b04f3abd3b36)
+
 What is FastAPI?
 FastAPI is a modern, fast (high-performance) web framework for building APIs using Python 3.7+ based on standard Python type hints. It is designed to be easy to use, highly efficient, and developer-friendly. FastAPI allows you to build APIs quickly with minimal code while leveraging the benefits of Python's type system for validation and documentation.
 
