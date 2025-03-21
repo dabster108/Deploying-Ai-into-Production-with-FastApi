@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel  # defines the data structure 
-
+from pydantic import ValidationError
 app = FastAPI()
 
 @app.get("/item/{item_id}")  # Fixed the path variable naming
@@ -21,3 +21,18 @@ def create_item(item : Item):
 # 200 : default for sucess 
 # 404 not found  : resource not found 
 # 201 : sucessfully object created 
+
+
+class User(BaseModel): # so the items now will inherit from the basemodel 
+    name : str 
+    email : str 
+    age : int 
+
+
+# Validation error 
+# try : 
+#     invalid_user = User(username = "dikshata" , email = "dikshanta@gmail.com",
+#                         age= 30)
+#     print("Invalid user : "  ,  invalid_user)
+# except ValidationError as e :
+#     print("Validation error ", e )

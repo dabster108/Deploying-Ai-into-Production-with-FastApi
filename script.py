@@ -14,8 +14,15 @@ app = FastAPI()
 
 
 # Loading the pretrained model 
-model = joblib.load('/Users/dikshanta/Documents/Fastapi_learning/penguin_classifier.pkl')
-print(type(model))
+import os
+file_path = "/Users/dikshanta/Documents/Fastapi_learning/penguin_classifier.pkl"
+
+if os.path.exists(file_path):
+    print("File exists.")
+else:
+    print("File not found. Check the path.")
+model = joblib.load("/Users/dikshanta/Documents/Fastapi_learning/penguin_classifier.pkl")
+print(f"Model Type: {type(model)}")
 
 #fastapi prediction endpoint 
 @app.post("/predict")
@@ -28,3 +35,8 @@ def predict(culmen_length_mm , culmen_depth_mm ,
 
     prediction = model.predict(features)[0]
     return{"predicted speceies " : prediction}
+
+
+
+
+# Create the prediction endpoint
