@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel  # defines the data structure 
-from pydantic import ValidationError
+from pydantic import BaseModel , Field # defines the data structure 
+from pydantic import ValidationError , validator
+import numpy as np 
+from scorer import CommentMetrics, CommentScorer
 app = FastAPI()
 
 @app.get("/item/{item_id}")  # Fixed the path variable naming
@@ -52,3 +54,96 @@ def get_user(user_name: str):
     if user_name not in users_db:
         return {"error": "User not found"}
     return users_db[user_name]
+
+
+class CommentMetrics(BaseModel):
+    length : int 
+    user_karma : int 
+    report_count : int 
+
+class CommentText(BaseModel):
+    content : str 
+
+
+class CommentMetrics(BaseModel):
+    length: float
+    user_karma: float
+    report_count: float
+
+class CommentScorer:
+    def __init__(self):
+        # You can load a trained model here if needed
+        pass
+
+
+# Assuming you have a model instance
+model = CommentScorer()  # Ensure CommentScoer is properly defined
+
+@app.post("/predict/comment")
+def predict_score(data: CommentMetrics):
+    # Convert the data into a 2D numpy array
+    features = np.array([[data.length, data.user_karma, data.report_count]])
+
+    # Predict using the model
+    prediction = model.predict(features)
+
+    return {
+        'prediction': round(prediction[0], 2),
+        'input': data.dict()
+    }
+
+
+# Endpoint for textual input 
+
+@app.post("/analyze-text")
+def analyze(comment: CommentText):
+    forbidden = ["spam", "fake", "hate", "free", "signup"]
+    text_lower = comment.content.lower()  # Convert text to lowercase
+
+    for word in forbidden:
+        if word in text_lower:
+            return {"issue": word}  # Return immediately when a forbidden word is found
+
+    return {"issue": "No issues detected"}
+
+
+
+@app.post("/predict_trust")
+def predict_trust(comment: CommentMetrics):
+    # Convert input and extract comment metrics
+    features = np.array([[
+        comment.length,
+        comment.user_reputation,
+        comment.report_count
+    ]])
+    # Get prediction from model 
+    score = model.predict(features)
+    return {
+        "trust_score": round(score, 2),
+        "comment_metrics": comment.dict()
+    }
+
+
+#Pydantic validators  
+class User(BaseModel):
+    username : str  = Field (... , min_length = 3 , max_length = 10)
+    age : int
+    email : str
+    @validator('age')
+    def age_credentials(cls,age):
+        if age < 18:
+            raise ValueError("Must be atleast 18")
+        return age
+    
+    @validator('email')
+    def email_must_be_example_domain(cls, user_email):
+        if not user_email.endswith("@gmail.com"):
+            raise ValueError('Email must be from the @gmail.com domain')
+        return user_email
+    
+
+@app.post("/register")
+# Validate incoming user data with a pydantic model
+def register_user(user: User):
+    return {"status": "success", "user": user.dict()}
+  
