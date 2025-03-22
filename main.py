@@ -147,3 +147,37 @@ class User(BaseModel):
 def register_user(user: User):
     return {"status": "success", "user": user.dict()}
   
+
+# defining request structure 
+sentiment_model = None  
+
+class PredictionRequest(BaseModel):
+    text: str 
+
+class PredictionResponse(BaseModel):
+    text: str 
+    sentiment: str 
+    confidence: float 
+
+@app.post("/predict/sentiment", response_model=PredictionResponse)
+def predict_sentiment(request: PredictionRequest):
+    global sentiment_model
+    
+    if sentiment_model is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Model not loaded"
+        )
+
+    try:
+        result = sentiment_model(request.text)  # Fixed incorrect attribute name
+        return PredictionResponse(
+            text=request.text,
+            sentiment=result[0]["label"],
+            confidence=result[0]["score"]  # Fixed key mismatch
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Prediction failed: {str(e)}"
+        )
