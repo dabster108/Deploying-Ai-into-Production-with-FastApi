@@ -17,3 +17,12 @@ if response.status_code == 200:
     print(f"Model downloaded successfully as {filename}")
 else:
     print(f"Failed to download model. Status code: {response.status_code}")
+
+
+''' Current Structure 
+Request - > Validation - > Prediction -> Response Structure - > Client 
+
+
+
+
+'''
