@@ -6,8 +6,11 @@ joblib : for loading the model
 
 '''
 import joblib
-from fastapi import FastAPI
+from fastapi import FastAPI , BackgroundTasks
 from contextlib import asynccontextmanager
+from pydantic import BaseModel
+import asyncio
+from typing import List
 
 
 # loading the pretrained penguin classifier 
@@ -81,3 +84,43 @@ async def health_check():
     if penguin_model is None:
         return {"status": "error", "message": "Model not loaded"}
     return {"status": "OK", "message": "Model loaded successfully"}
+
+
+#Asynchronous processing
+
+class Comment(BaseModel):
+    text: str
+
+# @app.post("/analyze")
+# def analyze_sync(comment : Comment):
+#     result = sentiment_model(comment.text)
+#     return{"sentiment" : result}
+
+async def sentiment_model(text: str):
+    # Simulating async processing (replace with actual async function if available)
+    import asyncio
+    await asyncio.sleep(1)  # Simulate a delay
+    return "Positive"  # Example output
+
+# @app.post("/analyze")
+# async def analyze_async(comment: Comment):
+#     result = await sentiment_model(comment.text)
+#     return {"sentiment": result}
+
+
+
+@app.post("/analyze")
+async def analyze_async(comment: Comment):
+    result = await asyncio.to_thread(sentiment_model , comment.text)
+    return {"sentiment": result}
+
+
+
+# Background Tasks 
+# - > manages the commenet processing queue 
+# @app.post("/analyze_batch")
+# async def analyze_batch(
+#     comment :Comment,
+#     background_tasks : BackgroundTasks
+# ):
+    

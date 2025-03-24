@@ -181,3 +181,4 @@ def predict_sentiment(request: PredictionRequest):
             status_code=500,
             detail=f"Prediction failed: {str(e)}"
         )
+    
