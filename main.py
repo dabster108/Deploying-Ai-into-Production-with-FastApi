@@ -1,8 +1,11 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel , Field # defines the data structure 
-from pydantic import ValidationError , validator
+from pydantic import ValidationError , validator, model_validator 
 import numpy as np 
 from scorer import CommentMetrics, CommentScorer
+from typing import List
+
+from fastapi.responses import PlainTextResponse
 app = FastAPI()
 
 @app.get("/item/{item_id}")  # Fixed the path variable naming
@@ -182,3 +185,45 @@ def predict_sentiment(request: PredictionRequest):
             detail=f"Prediction failed: {str(e)}"
         )
     
+
+class Foo(BaseModel):
+    count : int 
+
+class Bar(BaseModel):
+    foo : Foo
+
+class OrderItem(BaseModel):
+    name : str 
+    quantity : int 
+
+class ResturantOrder(BaseModel):
+    customer_name  : str 
+    items : List[OrderItem]
+
+
+    # custome model validators 
+    from fastapi.exceptions import(
+        RequestValidationError
+    )
+
+    from pydantic import(
+        BaseModel,
+        model_validator
+    )
+    
+class Order(BaseModel):
+    items: int
+
+    @model_validator(mode="after")
+    def validate_after(self):
+        if self.items == 0:
+            raise ValueError("No items in order")
+        return self
+
+@app.post("/order")
+async def create_order(order: Order):
+    return {"message": "Order created successfully", "items": order.items}
+
+
+
+#@app.exception_handler(RequestValidationError)

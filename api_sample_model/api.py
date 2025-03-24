@@ -135,6 +135,28 @@ def health_check():
         "model_loaded": sentiment_model is not None
     }
 
+
+class AIJobV1(BaseModel):
+    job_name  : str 
+    data : bytes 
+
+
+class AIJobV2(BaseModel):
+    job_name : str 
+    data: bytes 
+    config : dict 
+
+@app.post("/v1/ai-job")
+def ai_job_v1(job :AIJobV1):
+    ...
+
+@app.post("/v2/ai-job")
+def ai_job_v2(job: AIJobV2):
+    ...
+    
+
+
+
 if __name__ == "__api_main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8080)
