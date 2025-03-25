@@ -21,8 +21,35 @@ else:
 
 ''' Current Structure 
 Request - > Validation - > Prediction -> Response Structure - > Client 
+# Step 1: Request Model
+class RequestModel(BaseModel):
+    input_data: str
 
+# Step 2: Validation
+def validate_request(request: RequestModel):
+    if not request.input_data:
+        raise HTTPException(status_code=400, detail="Input data is required")
+    return request.input_data
 
+# Step 3: Prediction (Dummy Logic)
+def make_prediction(data: str):
+    return {"prediction": f"Processed: {data}"}
 
+# Step 4: Response Structure
+class ResponseModel(BaseModel):
+    result: str
+
+@app.post("/predict", response_model=ResponseModel)
+def predict(request: RequestModel):
+    validated_data = validate_request(request)
+    prediction = make_prediction(validated_data)
+    return ResponseModel(result=prediction["prediction"])
+
+# Step 5: Client (Example cURL)
+"""
+curl -X 'POST' 'http://127.0.0.1:8000/predict' \
+-H 'Content-Type: application/json' \
+-d '{"input_data": "example"}'
+"""
 
 '''
